@@ -27,11 +27,13 @@ public class TetrisSpawner : MonoBehaviour{
         var count = blockPrefabs.Length;
         var prefab = blockPrefabs[Random.Range(0, count)];
         var inst = Instantiate(prefab, _tetrisManager.transform).GetComponent<TetrisBlock>();
-        var position = new Vector2Int(playerIndex == 0 ? 3 : 7, 1);// _tetrisManager.TotalSize.x / 2 - 1, 1);
+        var position = new Vector2Int(playerIndex == 0 ? 3 : 7, -1);// _tetrisManager.TotalSize.x / 2 - 1, 1);
         inst.GridPosition = position;
         foreach (var spr in inst.SingleBlocks.Select(b => b.Spr)){
             spr.color = playerIndex == 0 ? Color.red : Color.blue;
         }
+
+        inst.PlayerIndex = playerIndex;
         _tetrisManager.Manage(inst);
         TetrisController.SetControlledBlock(playerIndex, inst);
     }

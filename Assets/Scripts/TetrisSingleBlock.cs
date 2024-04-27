@@ -5,9 +5,23 @@ public interface ITetrisSingleBlockParent{
 }
 
 public class TetrisSingleBlock{
-    public bool IsLocked = false;
+
+    private bool _isLocked = false;
+
+    public bool IsLocked{
+        get => _isLocked;
+        set{
+            if (!_isLocked){
+                JustLocked = true;
+            }
+            _isLocked = value;
+        }
+    }
+    
     public SpriteRenderer Spr;
     public ITetrisSingleBlockParent Parent;
+    public int PlayerIndex = -1;
+    public bool JustLocked = false;
 
     private Vector2Int _gridPosition;
     public Vector2Int GridPosition{

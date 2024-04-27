@@ -12,6 +12,15 @@ public class TetrisGrid : MonoBehaviour, ITetrisSingleBlockParent{
 
     private readonly List<TetrisBlock> _managed = new();
     private TetrisSingleBlock[,] _occupied;
+    private readonly List<TetrisBlock> _locked = new();
+
+    public struct LineClearResult{
+        public int PlayerIndex; // 0 or 1
+        public int NumOfClearedLine;
+    }
+
+    public event Action<TetrisGrid, LineClearResult[]> LineCleared;
+    public event Action<TetrisGrid, int[]> BlockOverflowByPlayer;
 
     public Vector2Int TotalSize => totalSize;
 
@@ -23,19 +32,19 @@ public class TetrisGrid : MonoBehaviour, ITetrisSingleBlockParent{
         grid = GetComponent<Grid>();
     }
 
+    private void Update(){
+        if (_locked.Count > 0){
+            CheckLockedBlocks();
+        }
+    }
+
     public void Manage(TetrisBlock inst){
         inst.Locked += b => {
-            int to = 0, from = int.MaxValue;
-            foreach (var objOccupiedBlock in b.OccupiedBlocks){
-                var p = objOccupiedBlock + b.GridPosition;
-                to = Math.Max(to, p.y);
-                from = Math.Min(from, p.y);
-            }
-            CheckClearLines(from, to);
+            _locked.Add(b);
         };
         inst.PositionChangedFromTo += (b, o, n) => {
-            ClearOccupied(b.OccupiedBlocks.Select(p => p + o));
-            SetOccupied(b.OccupiedBlocks.Select(p => p + n), b.SingleBlocks);
+            ClearOccupied(b.RelativeOccupiedPositions.Select(p => p + o));
+            SetOccupied(b.RelativeOccupiedPositions.Select(p => p + n), b.SingleBlocks);
         };
         inst.OccupiedBlockChangedFromTo += (b, o, n) => {
             ClearOccupied(o.Select(p => p + b.GridPosition));
@@ -44,14 +53,49 @@ public class TetrisGrid : MonoBehaviour, ITetrisSingleBlockParent{
         _managed.Add(inst);
     }
 
+    private void CheckLockedBlocks(){
+        var overflowPlayer = ListPool<int>.New();
+        foreach (var b in _locked){
+            int to = 0, from = int.MaxValue;
+            foreach (var pos in b.RelativeOccupiedPositions){
+                var p = pos + b.GridPosition;
+                to = Math.Max(to, p.y);
+                from = Math.Min(from, p.y);
+            }
+
+            if (from < 0){
+                overflowPlayer.Add(b.PlayerIndex);
+            }
+
+            from = Math.Max(0, from);
+            to = Math.Min(19, to);
+            var res = CheckClearLines(from, to);
+            if (res.Length > 0) LineCleared?.Invoke(this, res);
+        }
+
+        if (overflowPlayer.Count > 0){
+            BlockOverflowByPlayer?.Invoke(this, overflowPlayer.ToArray());
+        }
+        ListPool<int>.Free(overflowPlayer);
+
+        foreach (var b in _occupied){
+            if (b == null) continue;
+            b.JustLocked = false;
+        }
+        
+        _locked.Clear();
+    }
+
     private void ClearOccupied(IEnumerable<Vector2Int> positions){
         foreach (var p in positions){
+            if (!IsInRange(p.x, p.y)) continue;
             _occupied[p.x, p.y] = null;
         }
     }
 
     private void SetOccupied(IEnumerable<Vector2Int> positions, IEnumerable<TetrisSingleBlock> blocks){
         foreach (var (pos, block) in positions.Zip(blocks, (i, singleBlock) => (i, singleBlock))){
+            if (!IsInRange(pos.x, pos.y)) continue;
             _occupied[pos.x, pos.y] = block;
         }
     }
@@ -81,10 +125,14 @@ public class TetrisGrid : MonoBehaviour, ITetrisSingleBlockParent{
         return grid.GetCellCenterWorld(new Vector3Int(gridPosition.x, -gridPosition.y, 0));
     }
 
-    public void CheckClearLines(int from, int to){
+    public LineClearResult[] CheckClearLines(int from, int to){
+        var dict = DictionaryPool<int, int>.New();
         foreach (var i in from.To(to)){
             if (!IsLineFull(i)) continue;
-            ClearLine(i);
+            var indices = ClearLine(i);
+            foreach (var ind in indices){
+                dict[ind] += 1;
+            }
         }
 
         var j = to;
@@ -101,15 +149,33 @@ public class TetrisGrid : MonoBehaviour, ITetrisSingleBlockParent{
                 j--;
             }
         }
-    }
 
-    public void ClearLine(int lineNum){
+        return dict.Select(p => new LineClearResult(){
+            PlayerIndex = p.Key,
+            NumOfClearedLine = p.Value
+        }).ToArray();
+    }
+    
+    /// <summary>
+    /// clear the line and return the playerIndices that triggers this line clear
+    /// </summary>
+    /// <param name="lineNum">the line index</param>
+    /// <returns>an array of player indices</returns>
+    public int[] ClearLine(int lineNum){
+        var list = ListPool<int>.New();
         foreach (var (i, j) in Line(lineNum)){
             var block = _occupied[i, j];
             _occupied[i, j] = null;
+            if (block.JustLocked){
+                list.Add(block.PlayerIndex);
+            }
             // TODO: Use object pool!
             Destroy(block.Spr.gameObject);
         }
+
+        var ret = list.ToArray();
+        ListPool<int>.Free(list);
+        return ret;
     }
 
     public bool IsLineFull(int num){

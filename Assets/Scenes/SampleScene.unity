@@ -239,7 +239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3ea90cbb23f5fd4381972699da2bb74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalSize: {x: 10, y: 20}
+  totalSize: {x: 5, y: 5}
   grid: {fileID: 512245408}
 --- !u!114 &512245411
 MonoBehaviour:

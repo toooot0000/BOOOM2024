@@ -16,8 +16,8 @@ public class TetrisBlock: MonoBehaviour{
         Rotate,
     }
     
-    [SerializeField]
-    private Vector2Int[] occupiedBlocks = new[]{
+    [FormerlySerializedAs("occupiedBlocks")] [SerializeField]
+    private Vector2Int[] relativeOccupiedPositions = new[]{
         new Vector2Int(0, 0),
         new Vector2Int(1, 0),
         new Vector2Int(0, 1),
@@ -36,16 +36,43 @@ public class TetrisBlock: MonoBehaviour{
             UpdateSingleBlocksGridPositions();
         }
     }
-    public Vector2Int[] OccupiedBlocks{
-        get => occupiedBlocks;
+    public Vector2Int[] RelativeOccupiedPositions{
+        get => relativeOccupiedPositions;
         private set{
-            occupiedBlocks = value;
+            relativeOccupiedPositions = value;
             UpdateSingleBlocksGridPositions();
         }
     }
 
-    public IEnumerable<Vector2Int> OccupiedGridPositions => OccupiedBlocks.Offset(GridPosition);
-    public TetrisSingleBlock[] SingleBlocks;
+    public int PlayerIndex{
+        set{
+            foreach (var s in SingleBlocks){
+                s.PlayerIndex = value;
+            }
+        }
+        get => SingleBlocks[0].PlayerIndex;
+    }
+
+    public IEnumerable<Vector2Int> OccupiedGridPositions => RelativeOccupiedPositions.Offset(GridPosition);
+
+    private TetrisSingleBlock[] _singleBlocks;
+    public TetrisSingleBlock[] SingleBlocks{
+        get{
+            if (_singleBlocks != null) return _singleBlocks;
+            var sprites = GetComponentsInChildren<SpriteRenderer>();
+            Assert.AreEqual(sprites.Length, relativeOccupiedPositions.Length, "Sprites length should be equal to blocks length");
+            var array = OccupiedGridPositions.ToArray();
+            _singleBlocks = sprites.Select((spr, i) => new TetrisSingleBlock(){
+                Spr = spr,
+                GridPosition = array[i],
+                Parent = _grid
+            }).ToArray();
+            foreach (var spr in sprites){
+                spr.transform.SetParent(_grid.transform);
+            }
+            return _singleBlocks;
+        }
+    }
     
     public event Action<TetrisBlock> Locked;
     public event Action<TetrisBlock, Vector2Int, Vector2Int> PositionChangedFromTo;
@@ -53,17 +80,6 @@ public class TetrisBlock: MonoBehaviour{
 
     private void Awake(){
         _grid = GetComponentInParent<TetrisGrid>();
-        var sprites = GetComponentsInChildren<SpriteRenderer>();
-        Assert.AreEqual(sprites.Length, occupiedBlocks.Length, "Sprites length should be equal to blocks length");
-        var array = OccupiedGridPositions.ToArray();
-        SingleBlocks = sprites.Select((spr, i) => new TetrisSingleBlock(){
-            Spr = spr,
-            GridPosition = array[i],
-            Parent = _grid
-        }).ToArray();
-        foreach (var spr in sprites){
-            spr.transform.SetParent(_grid.transform);
-        }
     }
 
     private void Start(){
@@ -83,7 +99,7 @@ public class TetrisBlock: MonoBehaviour{
 
     public void MoveTo(Vector2Int newPosition){
         if (_isLocked) return;
-        if (_grid.CanFitIn(OccupiedBlocks.Offset(newPosition), new [] { this })){
+        if (_grid.CanFitIn(RelativeOccupiedPositions.Offset(newPosition), new [] { this })){
             var old = GridPosition;
             GridPosition = newPosition;
             PositionChangedFromTo?.Invoke(this, old, newPosition);
@@ -93,11 +109,11 @@ public class TetrisBlock: MonoBehaviour{
 
     public void Rotate(bool clockWise){
         if (_isLocked) return;
-        var newOccupied = OccupiedBlocks.Select(p => clockWise ? new Vector2Int(p.y, -p.x) : new Vector2Int(-p.y, p.x))
+        var newOccupied = RelativeOccupiedPositions.Select(p => clockWise ? new Vector2Int(p.y, -p.x) : new Vector2Int(-p.y, p.x))
             .ToArray();
         if (_grid.CanFitIn(newOccupied.Offset(GridPosition), new [] { this })){
-            var olc = OccupiedBlocks;
-            OccupiedBlocks = newOccupied;
+            var olc = RelativeOccupiedPositions;
+            RelativeOccupiedPositions = newOccupied;
             OccupiedBlockChangedFromTo?.Invoke(this, olc, newOccupied);
         }
         CheckLock();
@@ -115,7 +131,6 @@ public class TetrisBlock: MonoBehaviour{
             Destroy(this);
         }
         
-        // TODO: Defer this method.
         if (!IsReachingBottom()) return;
         _isLocked = true;
         StartCoroutine(Inner());
@@ -133,10 +148,6 @@ public class TetrisBlock: MonoBehaviour{
     }
 
     private void UpdateSingleBlocksGridPositions(){
-        // var array = OccupiedGridPositions.ToArray();
-        // foreach (var (i, block) in SingleBlocks.Enumerated()){
-        //     block.GridPosition = array[i];
-        // }
         foreach (var (single, pos) in SingleBlocks.Zip(OccupiedGridPositions, (block, pos) => (block, pos))){
             single.GridPosition = pos;
         }

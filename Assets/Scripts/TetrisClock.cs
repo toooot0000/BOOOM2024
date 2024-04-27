@@ -8,15 +8,13 @@ public class TetrisClock: MonoBehaviour{
     public event Action BeforeMoveTick;
     public event Action MoveTick;
     public event Action AfterMoveTick;
-
-    [SerializeField] private float tickTime = .5f;
+    
+    /// <summary>
+    /// Control fall down interval.
+    /// </summary>
+    [SerializeField] public float tickTime = .5f;
 
     private float _timer = 0;
-
-    public float TickTime{
-        get => tickTime;
-        private set => tickTime = value;
-    }
 
     private void Awake(){
         if (_shared != null) Destroy(this);
