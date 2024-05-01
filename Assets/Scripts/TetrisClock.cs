@@ -12,7 +12,7 @@ public class TetrisClock: MonoBehaviour{
     /// <summary>
     /// Control fall down interval.
     /// </summary>
-    [SerializeField] public float tickTime = .5f;
+    public float tickTime = .5f;
 
     private float _timer = 0;
 

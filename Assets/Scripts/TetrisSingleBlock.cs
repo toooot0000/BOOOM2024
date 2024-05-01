@@ -22,6 +22,7 @@ public class TetrisSingleBlock{
     public ITetrisSingleBlockParent Parent;
     public int PlayerIndex = -1;
     public bool JustLocked = false;
+    public int SpawnBatch = -1;
 
     private Vector2Int _gridPosition;
     public Vector2Int GridPosition{

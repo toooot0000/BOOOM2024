@@ -14,6 +14,7 @@ public class TetrisBlock: MonoBehaviour{
         Right,
         Down,
         Rotate,
+        ForceFall
     }
     
     [FormerlySerializedAs("occupiedBlocks")] [SerializeField]
@@ -51,6 +52,14 @@ public class TetrisBlock: MonoBehaviour{
             }
         }
         get => SingleBlocks[0].PlayerIndex;
+    }
+
+    public int SpawnBatch{
+        set{
+            foreach (var s in SingleBlocks){
+                s.SpawnBatch = value;
+            }
+        }
     }
 
     public IEnumerable<Vector2Int> OccupiedGridPositions => RelativeOccupiedPositions.Offset(GridPosition);
@@ -97,6 +106,16 @@ public class TetrisBlock: MonoBehaviour{
         MoveTo(newPosition);
     }
 
+    public void ForceFall(){
+        var position = GridPosition + Vector2Int.up;
+        var prevPos = GridPosition;
+        while (_grid.CanFitIn(RelativeOccupiedPositions.Offset(position), TetrisController.Shared.ControlledBlock)){
+            prevPos = position;
+            position += Vector2Int.up;
+        }
+        MoveTo(prevPos);
+    }
+
     public void MoveTo(Vector2Int newPosition){
         if (_isLocked) return;
         if (_grid.CanFitIn(RelativeOccupiedPositions.Offset(newPosition), new [] { this })){
@@ -128,7 +147,7 @@ public class TetrisBlock: MonoBehaviour{
                 b.IsLocked = true;
             }
             Locked?.Invoke(this);
-            Destroy(this);
+            Destroy(gameObject);
         }
         
         if (!IsReachingBottom()) return;
@@ -167,6 +186,9 @@ public class TetrisBlock: MonoBehaviour{
             break;
         case Command.Rotate:
             Rotate(true);
+            break;
+        case Command.ForceFall:
+            ForceFall();
             break;
         default:
             throw new ArgumentOutOfRangeException(nameof(command), command, null);
