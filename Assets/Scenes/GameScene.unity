@@ -2270,7 +2270,21 @@ MonoBehaviour:
   - {fileID: 8806989870880310936, guid: 274850ab34920694b9b368aa504289e7, type: 3}
   - {fileID: 8806989870880310936, guid: 9194ae801f0f13f43b0798a5a7acffd5, type: 3}
   - {fileID: 8806989870880310936, guid: 98c98d829bbd0254c9e0f5858f298b6e, type: 3}
-  prefabs: []
+  prefabs:
+  - type: 0
+    blockPrefab: {fileID: 8806989870880310936, guid: c56dec7784e921f4a91ebcf9c430476a, type: 3}
+  - type: 1
+    blockPrefab: {fileID: 8806989870880310936, guid: b5357afe252402f4b98258276a599a6a, type: 3}
+  - type: 2
+    blockPrefab: {fileID: 8806989870880310936, guid: f707aed739481434d88f0f94b9c103cc, type: 3}
+  - type: 3
+    blockPrefab: {fileID: 8806989870880310936, guid: 29a1c2bd169f22c4e8c59a38aaf19bed, type: 3}
+  - type: 4
+    blockPrefab: {fileID: 8806989870880310936, guid: 274850ab34920694b9b368aa504289e7, type: 3}
+  - type: 5
+    blockPrefab: {fileID: 8806989870880310936, guid: 9194ae801f0f13f43b0798a5a7acffd5, type: 3}
+  - type: 6
+    blockPrefab: {fileID: 8806989870880310936, guid: 98c98d829bbd0254c9e0f5858f298b6e, type: 3}
 --- !u!114 &1012449511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2307,7 +2321,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.95, y: 3.66, z: 0}
-  m_LocalScale: {x: 0.7875, y: 0.7879687, z: 1}
+  m_LocalScale: {x: 0.76781255, y: 0.7879687, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1206847636}
