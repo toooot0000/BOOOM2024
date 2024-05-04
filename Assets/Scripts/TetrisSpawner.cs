@@ -13,6 +13,13 @@ public enum TetrisType{
     Z
 }
 
+public static class EnumExt{
+    public static T Rand<T>(this T e) where T: Enum{
+        var values = Enum.GetValues(typeof(T));
+        return (T)values.GetValue(Random.Range(0, values.Length-1));
+    }
+}
+
 public class TetrisSpawner : MonoBehaviour{
 
     [Serializable]
@@ -21,22 +28,29 @@ public class TetrisSpawner : MonoBehaviour{
         public GameObject blockPrefab;
     }
     
-    [SerializeField] private GameObject[] blockPrefabs;
     [SerializeField] private Pair[] prefabs;
     
     private TetrisGrid _tetrisManager;
-    private int _prevIndex = 0;
     public readonly int[] SpawnBatch = {0, 0};
-    
+    [NonSerialized]
+    public TetrisType[] Next ={ TetrisType.I, TetrisType.T };
+
+    public event Action<int, TetrisType> PlayerNextTetrisTypeUpdated;
 
     private void Awake(){
         _tetrisManager = GetComponent<TetrisGrid>();
     }
 
+    public void OnGameStart(){
+        Next = new [] {RandType(), RandType()} ;
+        PlayerNextTetrisTypeUpdated?.Invoke(0, Next[0]);
+        PlayerNextTetrisTypeUpdated?.Invoke(1, Next[1]);
+    }
+
     public void Spawn(int playerIndex){
-        var count = prefabs.Length;
-        var prefab = prefabs[Random.Range(0, count)];
-        Spawn(playerIndex, prefab.type);
+        Spawn(playerIndex, Next[playerIndex]);
+        Next[playerIndex] = RandType();
+        PlayerNextTetrisTypeUpdated?.Invoke(playerIndex, Next[playerIndex]);
     }
 
     public void Spawn(int playerIndex, TetrisType type){
@@ -60,5 +74,10 @@ public class TetrisSpawner : MonoBehaviour{
         inst.PlayerIndex = playerIndex;
         _tetrisManager.Manage(inst);
         TetrisController.SetControlledBlock(playerIndex, inst);
+    }
+
+    private TetrisType RandType(){
+        var count = prefabs.Length;
+        return prefabs[Random.Range(0, count)].type;
     }
 }

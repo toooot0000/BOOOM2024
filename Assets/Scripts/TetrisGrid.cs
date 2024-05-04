@@ -127,6 +127,8 @@ public class TetrisGrid : MonoBehaviour, ITetrisSingleBlockParent{
 
     public LineClearResult[] CheckClearLines(int from, int to){
         var dict = DictionaryPool<int, int>.New();
+        dict[0] = 0;
+        dict[1] = 0;
         foreach (var i in from.To(to)){
             if (!IsLineFull(i)) continue;
             var indices = ClearLine(i);
