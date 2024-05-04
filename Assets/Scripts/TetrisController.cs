@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -38,6 +39,11 @@ public class TetrisController: MonoBehaviour{
         foreach (var (idx, map) in ControlMap.Enumerated()){
             foreach (var (key, value) in map){
                 if (Input.GetKeyDown(value) && ControlledBlock[idx] != null){
+                    if (GameController.Shared.SideEffects[idx].Any(s => s.Type == SideEffectType.CantSpin)){
+                        if (key == TetrisBlock.Command.Rotate){
+                            continue;
+                        }
+                    }
                     ControlledBlock[idx].TakeCommand(key);
                 }
             }

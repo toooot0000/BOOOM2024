@@ -14,7 +14,7 @@ public enum TetrisType{
 }
 
 public static class EnumExt{
-    public static T Rand<T>(this T e) where T: Enum{
+    public static T Rand<T>() where T: Enum{
         var values = Enum.GetValues(typeof(T));
         return (T)values.GetValue(Random.Range(0, values.Length-1));
     }

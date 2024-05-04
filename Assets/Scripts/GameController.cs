@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -11,10 +12,15 @@ public enum GameState{
     Pause,
 }
 
-public enum SideEffect{
+public enum SideEffectType{
     CantSpin,
-    OpponentDoublePoints,
+    DoublePoints,
     Length,
+}
+
+public class SideEffect{
+    public SideEffectType Type;
+    public float RemainTime;
 }
 
 public class Bindable<T>{
@@ -62,7 +68,11 @@ public class GameController: MonoBehaviour{
     public readonly int[] PlayerPoints = {0, 0};
     public readonly DateTime?[] LastClearTime ={ null, null };
     public readonly int[] ComboNums ={ 0, 0 };
-    public readonly HashSet<SideEffect>[] SideEffects = new HashSet<SideEffect>[2] { new(), new()};
+
+    /// <summary>
+    /// (playerIndex, sideEffect, remainingTime)
+    /// </summary>
+    public readonly List<SideEffect>[] SideEffects = new List<SideEffect>[2]{ new(), new() };
 
     /// <summary>
     /// 游戏状态，初始为PreStart
@@ -88,7 +98,7 @@ public class GameController: MonoBehaviour{
     /// <summary>
     /// (playerIndex, (sideEffect, remainingTime))
     /// </summary>
-    public event Action<int, (SideEffect, float)[]> PlayerSideEffectsUpdated;
+    public event Action<int, SideEffect[]> PlayerSideEffectsUpdated;
 
     /// <summary>
     /// Time out
@@ -104,8 +114,16 @@ public class GameController: MonoBehaviour{
         grid.LineCleared += (tetrisGrid, results) => {
             foreach (var r in results){
                 UpdateCombo(r);
-                PlayerPoints[r.PlayerIndex] += PointFromClearedLineNum(r.NumOfClearedLine);
+                PlayerPoints[r.PlayerIndex] += PointFromClearedLineNum(r.PlayerIndex, r.NumOfClearedLine);
                 PlayerPointChanged?.Invoke(r.PlayerIndex, PlayerPoints[r.PlayerIndex], ComboNums[r.PlayerIndex]);
+
+                var sideEff = EnumExt.Rand<SideEffectType>();
+                if (sideEff == SideEffectType.DoublePoints){
+                    AddSideEffect(1 - r.PlayerIndex, SideEffectType.DoublePoints);
+                } else{
+                    AddSideEffect(r.PlayerIndex, sideEff);
+                }
+
             }
         };
         grid.BlockOverflowByPlayer += (tetrisGrid, ints) => {
@@ -124,11 +142,23 @@ public class GameController: MonoBehaviour{
     }
 
     private void Update(){
-        if (State.Value == GameState.Idle){
-            _timer += Time.deltaTime;
-            if (_timer >= totalTimeInSec){
-                TimeOut();
+        if (State.Value != GameState.Idle) return;
+        _timer += Time.deltaTime;
+        
+        for (var i = 0; i<2; i++){
+            var effList = SideEffects[i];
+            foreach (var eff in effList){
+                eff.RemainTime -= Time.deltaTime;
             }
+
+            if (effList.All(eff => eff.RemainTime > 0)) continue;
+            
+            SideEffects[i] = effList.Where(eff => eff.RemainTime > 0).ToList();
+            PlayerSideEffectsUpdated?.Invoke(i, SideEffects[i].ToArray());
+        }
+        
+        if (_timer >= totalTimeInSec){
+            TimeOut();
         }
     }
 
@@ -153,12 +183,37 @@ public class GameController: MonoBehaviour{
         
     }
 
-    public int PointFromClearedLineNum(int num){
-        return num switch{
+    public int PointFromClearedLineNum(int playerIndex, int num){
+        var ret = num switch{
             >= 1 and < 4 => PointOfClearLineNum[num],
             >= 4 => 800,
             _ => 0
         };
+        if (SideEffects[playerIndex].Any(s => s.Type == SideEffectType.DoublePoints)){
+            ret *= 2;
+        }
+        return ret;
+    }
+
+    public void AddSideEffect(int playerIndex, SideEffectType type){
+        var sideEff = SideEffects[playerIndex];
+        var found = false;
+        foreach (var eff in sideEff){
+            if (eff.Type == type){
+                eff.RemainTime = 10;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found){
+            sideEff.Add(new(){
+                Type = type,
+                RemainTime = 10
+            });
+        }
+                
+        PlayerSideEffectsUpdated?.Invoke(playerIndex, sideEff.ToArray());
     }
 
     private void UpdateCombo(TetrisGrid.LineClearResult r){
