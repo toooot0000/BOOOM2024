@@ -4338,6 +4338,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8814883766720195051, guid: 12b76f6173c81af4caaa74edcee7cf4a, type: 3}
+      propertyPath: m_Text
+      value: "\u65CB\u8F6C"
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
