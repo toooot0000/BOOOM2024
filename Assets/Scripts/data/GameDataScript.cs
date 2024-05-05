@@ -24,22 +24,10 @@ public class GameDataScript : MonoBehaviour
     //0暂停  1游戏中 2结算
     public int gameStatus = 0;
 
-    public RoleAttr blueRole;
-    public RoleAttr redRole;
     void Awake()
     {
         if (data == null) { data = this; DontDestroyOnLoad(gameObject); }
         else if (data != this) { Destroy(gameObject); }
     }
-
-
-}
-
-//角色基础信息
-public class RoleAttr
-{
-    public string name;
-    public string skill;
-    public Sprite sprite;
 
 }
