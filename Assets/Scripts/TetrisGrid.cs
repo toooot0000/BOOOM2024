@@ -151,8 +151,9 @@ public class TetrisGrid : MonoBehaviour, ITetrisSingleBlockParent{
                 j--;
             }
         }
-
-        return dict.Select(p => new LineClearResult(){
+        
+        return dict.Where(p => p.Value > 0)
+            .Select(p => new LineClearResult(){
             PlayerIndex = p.Key,
             NumOfClearedLine = p.Value
         }).ToArray();

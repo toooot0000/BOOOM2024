@@ -116,7 +116,7 @@ public class GameController: MonoBehaviour{
                 UpdateCombo(r);
                 PlayerPoints[r.PlayerIndex] += PointFromClearedLineNum(r.PlayerIndex, r.NumOfClearedLine);
                 PlayerPointChanged?.Invoke(r.PlayerIndex, PlayerPoints[r.PlayerIndex], ComboNums[r.PlayerIndex]);
-
+                
                 var sideEff = EnumExt.Rand<SideEffectType>();
                 if (sideEff == SideEffectType.DoublePoints){
                     AddSideEffect(1 - r.PlayerIndex, SideEffectType.DoublePoints);
