@@ -12,8 +12,14 @@ public class nextScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)){
+    }
+    void OnGUI()
+    {
+        Event e = Event.current;
+        if (e.isKey)
+        {
             SceneManager.LoadScene("RoleScene");
+            Debug.Log("Detected key code: " + e.keyCode);
         }
     }
 }
