@@ -38,29 +38,29 @@ public class GameMainScript : MonoBehaviour
     //∑÷ ˝≤‚ ‘
     void UpdateScore()
     {
-        System.Random r = new System.Random();
-        GameDataScript.data.speed = r.Next(9);
-        GameDataScript.data.blueScore = r.Next(9999999);
-        GameObject[] objects = GameObject.FindGameObjectsWithTag("score");
-        foreach (GameObject obj in objects)
-        {
-            Destroy(obj);
-        }
-        Vector2 position = new Vector2(-740, -232);
-        int[] result = CastScore(GameDataScript.data.blueScore.ToString());
-        
-        for (int i = 0; i < result.Length; i++)
-        {
-            
-            GameObject imageContainer = new GameObject("scoreImage" + second);
-            imageContainer.tag = "score";
-            imageContainer.transform.SetParent(canvas.transform, false);
-            Image dynamicImage = imageContainer.AddComponent<Image>();
-            RectTransform rectTransform = imageContainer.GetComponent<RectTransform>();
-            rectTransform.sizeDelta = new Vector2(41, 69);
-            rectTransform.anchoredPosition = new Vector2(-740 + i * 50, -232);
-            dynamicImage.sprite = blueScoreSprites[result[i]];
-        }
+        // System.Random r = new System.Random();
+        // GameDataScript.data.speed = r.Next(9);
+        // GameDataScript.data.blueScore = r.Next(9999999);
+        // GameObject[] objects = GameObject.FindGameObjectsWithTag("score");
+        // foreach (GameObject obj in objects)
+        // {
+        //     Destroy(obj);
+        // }
+        // Vector2 position = new Vector2(-740, -232);
+        // int[] result = CastScore(GameDataScript.data.blueScore.ToString());
+        //
+        // for (int i = 0; i < result.Length; i++)
+        // {
+        //     
+        //     GameObject imageContainer = new GameObject("scoreImage" + second);
+        //     imageContainer.tag = "score";
+        //     imageContainer.transform.SetParent(canvas.transform, false);
+        //     Image dynamicImage = imageContainer.AddComponent<Image>();
+        //     RectTransform rectTransform = imageContainer.GetComponent<RectTransform>();
+        //     rectTransform.sizeDelta = new Vector2(41, 69);
+        //     rectTransform.anchoredPosition = new Vector2(-740 + i * 50, -232);
+        //     dynamicImage.sprite = blueScoreSprites[result[i]];
+        // }
     }
     // Update is called once per frame
     void Update()

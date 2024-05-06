@@ -133,7 +133,7 @@ public class RoleScript : MonoBehaviour
                 blueSeek--;
                 if (blueSeek < 0)
                 {
-                    blueSeek = 2;
+                    blueSeek = 1;
                 }
                 updateBlueAnimation();
                 updateSelect();
@@ -171,7 +171,7 @@ public class RoleScript : MonoBehaviour
                 redSeek--;
                 if (redSeek < 0)
                 {
-                    redSeek = 2;
+                    redSeek = 1;
                 }
                 updateRedAnimation();
                 updateSelect();
@@ -189,7 +189,7 @@ public class RoleScript : MonoBehaviour
                 updateRoleInfo();
             }
         }
-        if (Input.GetKeyDown(KeyCode.LeftControl))
+        if (Input.GetKeyDown(KeyCode.RightControl))
         {
             if (redStatus == 1)
             {
@@ -202,8 +202,37 @@ public class RoleScript : MonoBehaviour
                 redSelected.SetActive(true);
             }
         }
-        if(redStatus==1&& buleStatus == 1)
-        {
+        if(redStatus==1&& buleStatus == 1){
+
+            SideEffectType TypeOfIndex(int i) => i switch{
+                0 => SideEffectType.DoublePoints,
+                1 => SideEffectType.CantSpin,
+                _ => SideEffectType.Length
+            };
+
+            String NameOfIndex(int i) => i switch{
+                0 => "¿ÕÊÖµÀöèÓã",
+                1 => "ÒìÎÅÂ¼ä½ÐÜ",
+                _ => throw new ArgumentOutOfRangeException(nameof(i), i, null)
+            };
+
+            var selectionBlue = new PlayerSelection(){
+                name = NameOfIndex(blueSeek),
+                img = roleList[blueSeek].sprite,
+                skeleton = roleAssets[blueSeek],
+                type = TypeOfIndex(blueSeek),
+                needFlipSkeleton = blueSeek == 1
+            };
+            var selectionRed = new PlayerSelection(){
+                name = NameOfIndex(redSeek),
+                img = roleList[redSeek].sprite,
+                skeleton = roleAssets[redSeek],
+                type = TypeOfIndex(redSeek),
+                needFlipSkeleton = redSeek != 1
+            };
+
+            GameDataScript.data.playerSelections = new[]{ selectionBlue, selectionRed };
+            
             SceneManager.LoadScene("GameScene");
         }
     }

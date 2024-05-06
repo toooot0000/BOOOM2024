@@ -1,7 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Spine.Unity;
 using UnityEngine;
+
+[Serializable]
+public struct PlayerSelection{
+    public String name;
+    public Sprite img;
+    public SkeletonDataAsset skeleton;
+    public bool needFlipSkeleton;
+    public SideEffectType type;
+}
 
 public class GameDataScript : MonoBehaviour
 {
@@ -23,7 +33,10 @@ public class GameDataScript : MonoBehaviour
     public static GameDataScript data;
     //0暂停  1游戏中 2结算
     public int gameStatus = 0;
-
+    
+    //角色选择结果
+    public PlayerSelection[] playerSelections = new PlayerSelection[2];
+    
     void Awake()
     {
         if (data == null) { data = this; DontDestroyOnLoad(gameObject); }
