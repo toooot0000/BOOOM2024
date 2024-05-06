@@ -42,8 +42,7 @@ public class Bindable<T>{
     }
 }
 
-public delegate void BeforeGameStart();
-
+[DefaultExecutionOrder(0)]
 public class GameController: MonoBehaviour{
     // Signleton
     public static GameController Shared;
