@@ -110,13 +110,16 @@ public class GameController: MonoBehaviour{
     }
 
     private void Start(){
+
+        var selection = GameDataScript.data.playerSelections;
+        
         grid.LineCleared += (tetrisGrid, results) => {
             foreach (var r in results){
                 UpdateCombo(r);
                 PlayerPoints[r.PlayerIndex] += PointFromClearedLineNum(r.PlayerIndex, r.NumOfClearedLine);
                 PlayerPointChanged?.Invoke(r.PlayerIndex, PlayerPoints[r.PlayerIndex], ComboNums[r.PlayerIndex]);
                 
-                var sideEff = EnumExt.Rand<SideEffectType>();
+                var sideEff = selection[r.PlayerIndex].type;
                 if (sideEff == SideEffectType.DoublePoints){
                     AddSideEffect(1 - r.PlayerIndex, SideEffectType.DoublePoints);
                 } else{

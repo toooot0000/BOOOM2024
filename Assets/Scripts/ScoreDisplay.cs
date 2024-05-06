@@ -15,6 +15,9 @@ public class ScoreDisplay : MonoBehaviour{
     public void ShowNumber(int num){
         number = num;
         var digits = CastScore(num);
+        if (digits.Length == 0 && num == 0){
+            digits = new[]{ 0 };
+        }
         var pos = Vector3.zero;
         var i = 0;
         for (; i < digits.Length; i++){
