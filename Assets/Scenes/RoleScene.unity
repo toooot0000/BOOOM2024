@@ -970,7 +970,6 @@ GameObject:
   - component: {fileID: 975395201}
   - component: {fileID: 975395200}
   - component: {fileID: 975395204}
-  - component: {fileID: 975395205}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1084,38 +1083,14 @@ MonoBehaviour:
   roleAssets:
   - {fileID: 11400000, guid: 9022324c0b781f544b5a5c71f78c265e, type: 2}
   - {fileID: 11400000, guid: d9616537e8af0f846b01af5aca2393f0, type: 2}
-  - {fileID: 11400000, guid: 9022324c0b781f544b5a5c71f78c265e, type: 2}
-  blueAnimation: {fileID: 57872429}
-  redAnimation: {fileID: 635311908}
   roleList:
   - {fileID: 1845269683}
   - {fileID: 549130988}
-  - {fileID: 1213126137}
-  imgParent: {fileID: 1195055705}
+  imgParent: {fileID: 975395203}
   blueStatusSprite: {fileID: 21300000, guid: d3b749af00ed122459c9ad827aa0a09a, type: 3}
   redStatusSprite: {fileID: 21300000, guid: b8c76d9dabc9d9045abc445d4207b001, type: 3}
   allSprite: {fileID: 21300000, guid: 6fec0691fd17f6f46aa9272f4a49db21, type: 3}
   canvas: {fileID: 975395202}
---- !u!114 &975395205
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 975395199}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 380b5f5dae8f7904d8e30e47b8ba1fb8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  blueScore: 0
-  redScore: 0
-  speed: 0
-  blueSpeed: 0
-  redSpeed: 0
-  now: 1
-  winner: 
-  gameStatus: 0
 --- !u!1 &1044031329
 GameObject:
   m_ObjectHideFlags: 0
@@ -1402,7 +1377,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d14a89191f8e4574195e149dfae6759b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 719c5de2f8e346c4fab272bb351eba27, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

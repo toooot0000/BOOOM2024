@@ -17,7 +17,7 @@ public class RoleScript : MonoBehaviour
     SkeletonAnimation redAnimation; // 指向Spine动画的引用
     List<RoleInfo> roleInfos { get; set; }
     public List<Image> roleList;
-    public Image imgParent;
+    public Transform imgParent;
     public Sprite blueStatusSprite;
     public Sprite redStatusSprite;
     public Sprite allSprite;
@@ -76,7 +76,7 @@ public class RoleScript : MonoBehaviour
         Destroy(blueStatusImg);
         Image blueRole = roleList[blueSeek];
         blueStatusImg = new GameObject("imgParent" + blueSeek);
-        blueStatusImg.transform.SetParent(imgParent.transform, false);
+        blueStatusImg.transform.SetParent(imgParent, false);
         // 添加Image组件
         Image blueImage = blueStatusImg.AddComponent<Image>();
         RectTransform blueTransform = blueStatusImg.GetComponent<RectTransform>();
@@ -88,7 +88,7 @@ public class RoleScript : MonoBehaviour
         Destroy(redStatusImg);
         Image redRole = roleList[redSeek];
         redStatusImg = new GameObject("redImgParent" + redSeek);
-        redStatusImg.transform.SetParent(imgParent.transform, false);
+        redStatusImg.transform.SetParent(imgParent, false);
         // 添加Image组件
         Image redImage = redStatusImg.AddComponent<Image>();
         RectTransform redTransform = redStatusImg.GetComponent<RectTransform>();
@@ -142,7 +142,7 @@ public class RoleScript : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.D))
             {
                 blueSeek++;
-                if (blueSeek >2 )
+                if (blueSeek >1 )
                 {
                     blueSeek = 0;
                 }
@@ -180,7 +180,7 @@ public class RoleScript : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
                 redSeek++;
-                if (redSeek > 2)
+                if (redSeek > 1)
                 {
                     redSeek = 0;
                 }
