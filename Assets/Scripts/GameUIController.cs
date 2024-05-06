@@ -23,6 +23,9 @@ public class GameUIController: MonoBehaviour{
     public TetrisTypePair[] blueBlocks;
 
     public TextMeshProUGUI[] names;
+    public TextMeshProUGUI[] seDesc;
+
+    public TimeDisplay timeDisplay;
 
     private void Awake(){
         
@@ -33,6 +36,10 @@ public class GameUIController: MonoBehaviour{
         GameController.Shared.PlayerNextBlockUpdated += (i, type) => {
             nextBlock[i].sprite = (i == 0 ? blueBlocks : redBlocks).First(p => p.type == type).spr;
         };
+
+        GameController.Shared.PlayerOverflow += playerIndices => { };
+
+        GameController.Shared.PlayerSideEffectsUpdated += (i, effects) => { };
     }
 
     private void Start(){
@@ -50,10 +57,23 @@ public class GameUIController: MonoBehaviour{
             }
 
             names[i].text = s.name;
+
+            seDesc[i].text = s.type switch{
+                SideEffectType.DoublePoints => "消除后，对方10秒内的得分翻倍",
+                SideEffectType.CantSpin => "消除后，10秒内自己无法进行旋转操作",
+                _ => ""
+            };
         }
 
         scores[0].ShowNumber(0);
         scores[1].ShowNumber(0);
         
     }
+
+    private void Update(){
+        var time = Mathf.RoundToInt(GameController.Shared.RemainingTime);
+        timeDisplay.ShowNumber(time);
+    }
+    
+    
 }

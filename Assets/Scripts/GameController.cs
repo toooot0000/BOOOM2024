@@ -68,6 +68,8 @@ public class GameController: MonoBehaviour{
     public readonly DateTime?[] LastClearTime ={ null, null };
     public readonly int[] ComboNums ={ 0, 0 };
 
+    public float RemainingTime => totalTimeInSec - _timer;
+
     /// <summary>
     /// (playerIndex, sideEffect, remainingTime)
     /// </summary>
@@ -137,6 +139,7 @@ public class GameController: MonoBehaviour{
         };
         
         TetrisController.Shared.ControlledBlockLocked += (i, block) => {
+            if (State.Value != GameState.Idle) return;
             spawner.Spawn(i);
         };
 
